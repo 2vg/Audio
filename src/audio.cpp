@@ -196,15 +196,20 @@ void SendVoiceDataLoop()
                 pData->mutable_audio()->set_allocated_voice_data(copied_data);
                 pData->mutable_audio()->set_section_number(g_SectionNumber);
                 pData->mutable_audio()->set_format(VoiceDataFormat_t::VOICEDATA_FORMAT_OPUS);
+                // apply per-recipient volume
+                pData->mutable_audio()->set_voice_level(api::GetPlayerVolume(slot));
                 // g_QueuedNextFrameFunc.push_back([client, pData]()
                 //                                 { client->GetNetChannel()->SendNetMessage(pData, NetChannelBufType_t::BUF_VOICE); });
                 client->SendNetMessage(pData, NetChannelBufType_t::BUF_VOICE);
             }
             else if (pAllData)
             {
-                // g_QueuedNextFrameFunc.push_back([client, pAllData]()
-                //                                 { client->GetNetChannel()->SendNetMessage(pAllData, NetChannelBufType_t::BUF_VOICE); });
-                client->SendNetMessage(pAllData, NetChannelBufType_t::BUF_VOICE);
+                // create a per-recipient copy to apply individual volume
+                INetworkMessageInternal *pSVC_VoiceData2 = g_pNetworkMessages->FindNetworkMessageById(47);
+                CNetMessagePB<CSVCMsg_VoiceData> *pData = pSVC_VoiceData2->AllocateMessage()->ToPB<CSVCMsg_VoiceData>();
+                pData->CopyFrom(*pAllData);
+                pData->mutable_audio()->set_voice_level(api::GetPlayerVolume(slot));
+                client->SendNetMessage(pData, NetChannelBufType_t::BUF_VOICE);
             }
 
             // data.msg->mutable_audio()->set_voice_level(GetPlayerVolume(slot));

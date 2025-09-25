@@ -7,28 +7,36 @@
 #include <string>
 #include <chrono>
 
-// void SetPlayerVolume(int slot, float factor)
-// {
-//   std::unique_lock<std::shared_mutex> lock(g_Mutex);
-//   g_PlayerVolume[slot] = factor;
-// }
-
-// void SetAllPlayerVolume(float factor)
-// {
-//   std::unique_lock<std::shared_mutex> lock(g_Mutex);
-//   for (int i = 0; i < MAX_SLOT; i++)
-//   {
-//     g_PlayerVolume[i] = factor;
-//   }
-// }
-
-// float GetPlayerVolume(int slot)
-// {
-//   std::shared_lock<std::shared_mutex> lock(g_Mutex);
-//   return g_PlayerVolume[slot];
-// }
+// Per-player volume controls (C++-side storage)
 namespace api
 {
+  void SetPlayerVolume(int slot, float factor)
+  {
+    std::unique_lock<std::shared_mutex> lock(g_Mutex);
+    if (slot < 0 || slot >= MAX_SLOT) return;
+    if (factor < 0.0f) factor = 0.0f;
+    if (factor > 1.0f) factor = 1.0f;
+    g_PlayerVolume[slot] = factor;
+  }
+
+  void SetAllPlayerVolume(float factor)
+  {
+    std::unique_lock<std::shared_mutex> lock(g_Mutex);
+    if (factor < 0.0f) factor = 0.0f;
+    if (factor > 1.0f) factor = 1.0f;
+    for (int i = 0; i < MAX_SLOT; i++)
+    {
+      g_PlayerVolume[i] = factor;
+    }
+  }
+
+  float GetPlayerVolume(int slot)
+  {
+    std::shared_lock<std::shared_mutex> lock(g_Mutex);
+    if (slot < 0 || slot >= MAX_SLOT) return 1.0f;
+    return g_PlayerVolume[slot];
+  }
+
   void SetPlayerHearing(int slot, bool hearing)
   {
     std::unique_lock<std::shared_mutex> lock(g_Mutex);
@@ -283,6 +291,22 @@ extern "C"
   bool __cdecl NativeIsHearing(int slot)
   {
     return api::IsHearing(slot);
+  }
+
+  // Per-player volume control exports
+  void __cdecl NativeSetPlayerVolume(int slot, float factor)
+  {
+    api::SetPlayerVolume(slot, factor);
+  }
+
+  void __cdecl NativeSetAllPlayerVolume(float factor)
+  {
+    api::SetAllPlayerVolume(factor);
+  }
+
+  float __cdecl NativeGetPlayerVolume(int slot)
+  {
+    return api::GetPlayerVolume(slot);
   }
 
   void __cdecl NativePlayToPlayer(int slot, const char *audioBuffer, int audioBufferSize, const char *audioPath, int audioPathSize, float volume)

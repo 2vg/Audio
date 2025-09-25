@@ -208,7 +208,7 @@ void ProcessVoiceData(int slot, unsigned long id, std::string audioBuffer, std::
       opus_buffers.push_back(data);
       if (opus_buffers.size() == 3)
       {
-        auto msg = FillVoiceMessage(opus_buffers, nullptr, 0.0f);
+        auto msg = FillVoiceMessage(opus_buffers, nullptr, volumeLevel);
         if (callback)
         {
           callback(msg);

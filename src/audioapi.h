@@ -21,6 +21,11 @@ namespace api
   void SetAllPlayerHearing(bool hearing);
   bool IsHearing(int slot);
 
+  // Per-player volume control (stored in C++ and applied per-recipient on send)
+  void SetPlayerVolume(int slot, float factor);
+  void SetAllPlayerVolume(float factor);
+  float GetPlayerVolume(int slot);
+
   /*
    * @param slot - player slot to set
    * @param voiceData - buffer string, contains pcm data, pass null means stop playing
@@ -82,6 +87,11 @@ extern "C"
   PINVOKE_EXPORT void NativeSetPlayerHearing(int slot, bool hearing);
   PINVOKE_EXPORT void NativeSetAllPlayerHearing(bool hearing);
   PINVOKE_EXPORT bool NativeIsHearing(int slot);
+
+  // Per-player volume control exports
+  PINVOKE_EXPORT void NativeSetPlayerVolume(int slot, float factor);
+  PINVOKE_EXPORT void NativeSetAllPlayerVolume(float factor);
+  PINVOKE_EXPORT float NativeGetPlayerVolume(int slot);
 
   PINVOKE_EXPORT void NativePlayToPlayer(int slot, const char *audioBuffer, int audioBufferSize, const char *audioPath, int audioPathSize, float volume = 1.0);
   PINVOKE_EXPORT void NativePlay(const char *audioBuffer, int audioBufferSize, const char *audioPath, int audioPathSize, float volume = 1.0);

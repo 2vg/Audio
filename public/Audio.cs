@@ -20,6 +20,15 @@ public unsafe static class Audio
     public static extern bool NativeIsHearing(int slot);
 
     [DllImport("audio", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void NativeSetPlayerVolume(int slot, float factor);
+
+    [DllImport("audio", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void NativeSetAllPlayerVolume(float factor);
+
+    [DllImport("audio", CallingConvention = CallingConvention.Cdecl)]
+    public static extern float NativeGetPlayerVolume(int slot);
+
+    [DllImport("audio", CallingConvention = CallingConvention.Cdecl)]
     public static extern void NativePlayToPlayer(int slot, [MarshalAs(UnmanagedType.LPArray)] byte[] audioBuffer, int audioBufferSize, string audioPath, int audioPathSize, float volume = 1f);
 
     [DllImport("audio", CallingConvention = CallingConvention.Cdecl)]
@@ -110,6 +119,21 @@ public unsafe static class Audio
   public static bool IsHearing(int slot)
   {
     return NativeMethods.NativeIsHearing(slot);
+  }
+
+  public static void SetPlayerVolume(int slot, float factor)
+  {
+    NativeMethods.NativeSetPlayerVolume(slot, factor);
+  }
+
+  public static void SetAllPlayerVolume(float factor)
+  {
+    NativeMethods.NativeSetAllPlayerVolume(factor);
+  }
+
+  public static float GetPlayerVolume(int slot)
+  {
+    return NativeMethods.NativeGetPlayerVolume(slot);
   }
 
   /*
